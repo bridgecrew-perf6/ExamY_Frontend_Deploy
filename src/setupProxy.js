@@ -3,7 +3,7 @@ module.exports = function(app){
   app.use(
     '/api',
     createProxyMiddleware({
-      target: 'https://examy-server.herokuapp.com',
+      target: 'http://13.209.224.207:5000/',
       changeOrigin: true,
     })
   )
