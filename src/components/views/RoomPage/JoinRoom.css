@@ -1,0 +1,37 @@
+aside{
+    height: 100vh;
+    text-align: center;
+    border-right: 3px solid black;
+    border-left: 3px solid black;
+  }
+  
+  iframe{
+    height: 70vh;
+  }
+  
+  #button {
+    height: 10vh;
+  }
+  
+  video {
+    object-fit: cover;
+  }
+  
+  #video {
+    width: 20vw;
+    object-fit: cover;
+    border-color: white;
+  }
+  
+  .beforeTest {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+  }
+  
+  .stream-container{
+    float: left;
+    width: 33vw;
+  }
+  

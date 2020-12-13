@@ -35,7 +35,7 @@ function RegisterPage(props) {
   const onUserImageHandler = (event) => {
     const formData = new FormData();
     formData.append('profile_img', event.target.files[0]);
-    Axios.post('https://examy-server.herokuapp.com/api/users/upload', formData,{
+    Axios.post('http://13.209.224.207:5000/api/users/upload', formData,{
       header: {'content-type' : 'multipart/form-data'},
     }).then((response) => {
       console.log(response.data.filename);

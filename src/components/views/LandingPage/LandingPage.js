@@ -5,7 +5,7 @@ import { withRouter } from 'react-router-dom'
 function LandingPage(props) {
   
   useEffect(() => {
-    axios.get('https://examy-server.herokuapp.com/api/hello')
+    axios.get('http://13.209.224.207:5000/api/hello')
     .then(response=> {console.log(response.data)})
   }, [])
 

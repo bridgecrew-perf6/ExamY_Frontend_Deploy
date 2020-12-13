@@ -1,2 +1,2 @@
 //SERVER ROUTES
-export const USER_SERVER = 'https://examy-server.herokuapp.com/api/users';
+export const USER_SERVER = 'http://13.209.224.207:5000/api/users';

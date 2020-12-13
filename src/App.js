@@ -29,7 +29,7 @@ function App() {
         <Route exact path="/login" component={Auth(LoginPage, false)} />
         <Route exact path="/register" component={Auth(RegisterPage, false)} />
         <Route exact path = "/maketest" component = {Auth(MakeTestPage, true)}/>
-        <Route exact path = "/joinroom" component = {Auth(JoinRoomPage, true)}/>
+        <Route exact path = "/joinroom" component = {Auth(JoinRoomPage, null)}/>
       </Switch>
     </div>
     <Footer/>
