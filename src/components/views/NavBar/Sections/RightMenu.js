@@ -26,7 +26,7 @@ function RightMenu(props) {
           <a href="/login">Sign in</a>
         </Menu.Item>
         <Menu.Item key="app">
-          <a href="https://nostalgic-mestorf-e2373b.netlify.app/register">Register</a>
+          <a href="/register">Register</a>
         </Menu.Item>
       </Menu>
     )

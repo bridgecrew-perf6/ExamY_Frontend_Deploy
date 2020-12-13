@@ -11,7 +11,7 @@ function LeftMenu(props) {
     return(
     <Menu mode={props.mode}>
       <Menu.Item key="mail">
-        <a href="https://nostalgic-mestorf-e2373b.netlify.app/">Home</a>
+        <a href="/">Home</a>
       </Menu.Item>
     </Menu>
     )
@@ -20,12 +20,12 @@ function LeftMenu(props) {
     return(
     <Menu mode={props.mode}>
       <Menu.Item key="mail">
-        <a href="https://nostalgic-mestorf-e2373b.netlify.app/">Home</a>
+        <a href="/">Home</a>
       </Menu.Item>
       <SubMenu title={<span>Exam</span>}>
         <MenuItemGroup title="Exam">
           <Menu.Item key="MakeExam">
-            <a href="https://nostalgic-mestorf-e2373b.netlify.app/maketest"></a> Make Exam </Menu.Item>
+            <a href="/maketest"></a> Make Exam </Menu.Item>
         </MenuItemGroup>
       </SubMenu>
     </Menu>
@@ -35,12 +35,12 @@ function LeftMenu(props) {
     return(
     <Menu mode={props.mode}>
       <Menu.Item key="mail">
-        <a href="https://nostalgic-mestorf-e2373b.netlify.app/">Home</a>
+        <a href="/">Home</a>
       </Menu.Item>
       <SubMenu title={<span>Exam</span>}>
         <MenuItemGroup title="Exam">
           <Menu.Item key="JoinRoom">
-            <a href="https://nostalgic-mestorf-e2373b.netlify.app/joinroom"></a>Join Room</Menu.Item>
+            <a href="/joinroom"></a>Join Room</Menu.Item>
         </MenuItemGroup>
       </SubMenu>
     </Menu>
