@@ -23,10 +23,10 @@ function RightMenu(props) {
     return (
       <Menu mode={props.mode}>
         <Menu.Item key="mail">
-          <a href="/login">Sign in</a>
+          <a href="https://nostalgic-mestorf-e2373b.netlify.app/login">Sign in</a>
         </Menu.Item>
         <Menu.Item key="app">
-          <a href="/register">Register</a>
+          <a href="https://nostalgic-mestorf-e2373b.netlify.app/register">Register</a>
         </Menu.Item>
       </Menu>
     )
