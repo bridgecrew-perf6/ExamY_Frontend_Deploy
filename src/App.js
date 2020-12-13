@@ -1,7 +1,7 @@
 import React, { Suspense } from 'react';
 import './App.css';
 import {
-  HashRouter as Router,
+  BrowserRouter as Router,
   Switch,
   Route,
   Link
@@ -25,9 +25,9 @@ function App() {
       <div style={{ paddingTop: '69px', minHeight: 'calc(100vh - 80px)' }}>
       <Switch>
         {/* admin 유저만 들어가고 싶으면 Auth(page, null, true) 이런 식으로 설정하면 된다. */}
-        <Route exact path="https://nostalgic-mestorf-e2373b.netlify.app" component={Auth(LandingPage, null)} />
-        <Route exact path="https://nostalgic-mestorf-e2373b.netlify.app/login" component={Auth(LoginPage, false)} />
-        <Route exact path="https://nostalgic-mestorf-e2373b.netlify.app/register" component={Auth(RegisterPage, false)} />
+        <Route exact path="/" component={Auth(LandingPage, null)} />
+        <Route exact path="/login" component={Auth(LoginPage, false)} />
+        <Route exact path="/register" component={Auth(RegisterPage, false)} />
         <Route exact path = "https://nostalgic-mestorf-e2373b.netlify.app/maketest" component = {Auth(MakeTestPage, true)}/>
         <Route exact path = "https://nostalgic-mestorf-e2373b.netlify.app/joinroom" component = {Auth(JoinRoomPage, true)}/>
       </Switch>
