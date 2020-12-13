@@ -13,7 +13,7 @@ import {
 
 export function loginUser(dataToSubmit){
 
-  const request = Axios.post('http://13.209.224.207:5000/api/users/login', dataToSubmit)
+  const request = Axios.post('https://server-jik.herokuapp.com/api/users/login', dataToSubmit)
     .then(response => response.data)
 
   return{
@@ -24,7 +24,7 @@ export function loginUser(dataToSubmit){
 
 export function registerUser(dataToSubmit){
 
-  const request = Axios.post('http://13.209.224.207:5000/api/users/register', dataToSubmit)
+  const request = Axios.post('https://server-jik.herokuapp.com/api/users/register', dataToSubmit)
     .then(response => response.data)
   return{
     type: REGISTER_USER,
@@ -33,7 +33,7 @@ export function registerUser(dataToSubmit){
 }
 
 export function auth(){
-  const request = Axios.get('http://13.209.224.207:5000/api/users/auth')
+  const request = Axios.get('https://server-jik.herokuapp.com/api/users/auth')
     .then(response => response.data)
     
   return{
@@ -44,7 +44,7 @@ export function auth(){
 
 export function UploadQuestion(dataToSubmit){
 
-  const request = Axios.post('http://13.209.224.207:5000/api/test/UploadQuestion', dataToSubmit)
+  const request = Axios.post('https://server-jik.herokuapp.com/api/test/UploadQuestion', dataToSubmit)
     .then(response => response.data)
 
   return{
@@ -55,7 +55,7 @@ export function UploadQuestion(dataToSubmit){
 
 export function MakeTest(dataToSubmit){
 
-  const request = Axios.post('http://13.209.224.207:5000/api/test/maketest', dataToSubmit)
+  const request = Axios.post('https://server-jik.herokuapp.com/api/test/maketest', dataToSubmit)
     .then(response => response.data)
 
   return{
@@ -66,7 +66,7 @@ export function MakeTest(dataToSubmit){
 
 export function FetchExam(dataToSubmit){
  
-  const request = Axios.post('http://13.209.224.207:5000/api/room/fetchexam', dataToSubmit)
+  const request = Axios.post('https://server-jik.herokuapp.com/api/room/fetchexam', dataToSubmit)
     .then(response => response.data)
   console.log(request)
   return{
@@ -77,7 +77,7 @@ export function FetchExam(dataToSubmit){
 
 export function FetchQuestions(dataToSubmit){
  
-  const request = Axios.post('http://13.209.224.207:5000/api/room/fetchquestions', dataToSubmit)
+  const request = Axios.post('https://server-jik.herokuapp.com/api/room/fetchquestions', dataToSubmit)
     .then(response => response.data)
   return{
     type: FETCH_QUESTIONS,
