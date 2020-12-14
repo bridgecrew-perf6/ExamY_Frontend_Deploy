@@ -238,8 +238,8 @@ function JoinRoomPage(props) {
 
       startFaceApi();
       startObjectDetect();
-      startMyModel();
-      startRecognizeFaces();
+      // startMyModel();
+      // startRecognizeFaces();
       
     } else {
       state.session
@@ -263,8 +263,8 @@ function JoinRoomPage(props) {
     document.querySelector("#startTest").disabled = false;
     clearInterval(faceapiInterval);
     clearInterval(objectdetectInterval);
-    clearInterval(sidefaceInterval);
-    clearInterval(faceReocogCheckInterval())
+    // clearInterval(sidefaceInterval);
+    // clearInterval(faceReocogCheckInterval())
     await records.stop();
     blob = records.getBlob();
     uploadVideo();
