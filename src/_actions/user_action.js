@@ -1,5 +1,5 @@
 import Axios from 'axios';
-// import {response} from 'express';
+import {useSelector} from 'react-redux';
 import {
   LOGIN_USER,
   REGISTER_USER,
@@ -32,8 +32,9 @@ export function registerUser(dataToSubmit){
   }
 }
 
-export function auth(){
-  const request = Axios.get('https://server-jik.herokuapp.com/api/users/auth')
+export function auth(dataToSubmit){
+
+  const request = Axios.post('https://server-jik.herokuapp.com/api/users/auth', dataToSubmit)
     .then(response => response.data)
     
   return{

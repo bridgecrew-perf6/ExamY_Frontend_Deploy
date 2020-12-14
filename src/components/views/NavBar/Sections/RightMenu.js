@@ -19,7 +19,7 @@ function RightMenu(props) {
     });
   };
 
-  if (!user.userData || (user.userData && !user.userData.isAuth)) {
+  if (!user.loginSuccess) {
     return (
       <Menu mode={props.mode}>
         <Menu.Item key="mail">

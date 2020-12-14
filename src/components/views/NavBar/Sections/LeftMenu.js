@@ -1,53 +1,35 @@
 import React from 'react';
 import { Menu } from 'antd';
 import {useSelector} from 'react-redux';
-const SubMenu = Menu.SubMenu;
-const MenuItemGroup = Menu.ItemGroup;
 
 function LeftMenu(props) {
   const user = useSelector(state => state.user)
 
-  if(!user.userData || (user.userData && !user.userData.isAuth)) {
+  if(!user.loginSuccess) {
     return(
-    <Menu mode={props.mode}>
-      <Menu.Item key="mail">
-        <a href="/">Home</a>
-      </Menu.Item>
-      <Menu.Item key="mail">
-        <a href="/joinroom">Exam</a>
-      </Menu.Item>
-    </Menu>
+      <></>
     )
   }
-  else if(user.userData && user.userData.isAdmin){
+  else if(user.loginSuccess && user.loginSuccess.user.role !== 0){
     return(
     <Menu mode={props.mode}>
       <Menu.Item key="mail">
-        <a href="/">Home</a>
+        <a href="/Exam">Exam</a>
       </Menu.Item>
-      <SubMenu title={<span>Exam</span>}>
-        <MenuItemGroup title="Exam">
-          <Menu.Item key="MakeExam">
-            <a href="/maketest"></a> Make Exam </Menu.Item>
-        </MenuItemGroup>
-      </SubMenu>
+      <Menu.Item key="mail">
+        <a href="/maketest">MakeExam</a>
+      </Menu.Item>
     </Menu>
     ) 
   }
   else{
     return(
-    <Menu mode={props.mode}>
-      <Menu.Item key="mail">
-        <a href="/">Home</a>
-      </Menu.Item>
-      <SubMenu title={<span>Exam</span>}>
-        <MenuItemGroup title="Exam">
-          <Menu.Item key="JoinRoom">
-            <a href="/joinroom"></a>Join Room</Menu.Item>
-        </MenuItemGroup>
-      </SubMenu>
-    </Menu>
-    ) 
+      <Menu mode={props.mode}>
+        <Menu.Item key="mail">
+          <a href="/Exam">Exam</a>
+        </Menu.Item>
+      </Menu>
+      ) 
   }
     
     

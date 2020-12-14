@@ -33,11 +33,15 @@ import {
   LoginOutlined,
   FormOutlined,
 } from "@ant-design/icons";
-import "./JoinRoom.css"
-
+import "./JoinRoom.css";
 
 const { Sider, Content } = Layout;
 const { Countdown } = Statistic;
+const { Title, Text } = Typography;
+const { Search } = Input;
+
+let score = 0;
+let correct = 0;
 
 const bucketName = "developjikvideo";
 const bucketRegion = "us-east-1"; // 리전
@@ -65,14 +69,18 @@ let connectionData = [];
 let faceapiInterval;
 let objectdetectInterval;
 let sidefaceInterval;
+let faceReocogCheckInterval
+
+let userimage = "";
 
 function JoinRoomPage(props) {
+  const user = useSelector((state) => state.user);
   let videoRef = useRef();
   let objectDetector;
   let classifier;
   let blob;
 
-  let images = ["unknown1", "unknown2", "unknown3", "unknown4", "unknown5"];
+  let images = ["/uploads/unknown1.png", "/uploads/unknown2.png", "/uploads/unknown3.png", "/uploads/unknown4.png", "/uploads/unknown5.png"];
   // axios로 사용자 이미지 요청하여 저장할 변수
 
   // const OPENVIDU_SERVER_URL = "https://" + "window.location.hostname" + ":4443";
@@ -93,11 +101,8 @@ function JoinRoomPage(props) {
 
   // ================================================
 
-  const user = useSelector((state) => state.user);
-  const { Content } = Layout;
+  const userLoginInfo = useSelector((state) => state.user);
   const dispatch = useDispatch();
-  const { Title, Text } = Typography;
-  const { Search } = Input;
 
   let [ExamId, setExamId] = useState("");
   const [ExamCode, setExamCode] = useState("");
@@ -129,6 +134,7 @@ function JoinRoomPage(props) {
     subscribers: [],
   });
 
+  // 건드리지 말것
   const getToken = () => {
     return createSession(state.mySessionId).then((sessionId) =>
       createToken(sessionId)
@@ -204,6 +210,7 @@ function JoinRoomPage(props) {
         .catch((error) => reject(error));
     });
   };
+  // 건드리지 말것
 
   // video 시작 코드
   const startVideo = () => {
@@ -216,43 +223,50 @@ function JoinRoomPage(props) {
 
   const startTest = async () => {
     if (test === 0) {
-      document.querySelector("#startTest>span").innerHTML = "Test End";
+      document.querySelector("#startTest>span").innerHTML = "시험 종료";
       document.querySelector("#startTest").disabled = true;
       await startVideo();
-      setTest(1);
-      setTimer(1);
+      message
+        .loading("Cam and Test Loading.. 잠시만 기다려 주세요...", 10)
+        .then(() => {
+          setTest(1);
+          setTimer(1);
+        });
+
       records = OV.initLocalRecorder(state.mainStreamManager["stream"]);
       records.record();
-      startFaceApi();
-      startObjectDetect();
-      startMyModel();
+
+      // startFaceApi();
+      // startObjectDetect();
+      // startMyModel();
+      // startRecognizeFaces();
+      
     } else {
       state.session
         .signal({
-          data: `${state.myUserName} Test End`, // Any string (optional)
+          data: `${state.myUserName} 시험 종료`, // Any string (optional)
           to: connectionData, // Array of Connection objects (optional. Broadcast to everyone if empty)
           type: "endTest", // The type of message (optional)
         })
         .then(() => {
+          setInital(2);
           console.log("메시지 전송 성공");
         })
         .catch((error) => {
           console.error(error);
         });
-      setInital(2);
     }
   };
 
   const startDownload = async () => {
-    setTimer(0);
-    clearInterval(faceapiInterval);
-    clearInterval(objectdetectInterval);
-    clearInterval(sidefaceInterval);
-    await records.stop();
+    // setTimer(0);
     document.querySelector("#startTest").disabled = false;
+    // clearInterval(faceapiInterval);
+    // clearInterval(objectdetectInterval);
+    // clearInterval(sidefaceInterval);
+    // clearInterval(faceReocogCheckInterval())
+    await records.stop();
     blob = records.getBlob();
-    // records.download();
-    // console.log(blob)
     uploadVideo();
   };
 
@@ -265,10 +279,10 @@ function JoinRoomPage(props) {
         .detectAllFaces(videoRef.current, new faceapi.TinyFaceDetectorOptions())
         .withFaceLandmarks();
       checkStart++;
-      if (checkStart > 10) {
+      if (checkStart > 5) {
         if (detections.length === 0) {
           checkFaceZero++;
-          if (checkFaceZero === 7) {
+          if (checkFaceZero === 5) {
             // 메세지 보내기 code +
             state.session
               .signal({
@@ -323,7 +337,7 @@ function JoinRoomPage(props) {
           return;
         }
         checkStart++;
-        if (checkStart > 10) {
+        if (checkStart > 5) {
           console.log("ObjectDetection", checkStart, results);
           results.map((result, i) => {
             if (result["label"] === "cell phone") {
@@ -362,14 +376,14 @@ function JoinRoomPage(props) {
             }
 
             checkStart++;
-            if (checkStart > 10) {
+            if (checkStart > 5) {
               console.log("MyModel", checkStart, results[0]);
               if (
-                results[0].label !== "face" &&
-                results[0].confidence - results[1].confidence > 0.25
+                results[0].label !== "face" 
+              // && results[0].confidence - results[1].confidence > 0.25
               ) {
                 checkCount++;
-                if (checkCount === 10) {
+                if (checkCount === 5) {
                   // 메세지 보내는 code +
                   state.session
                     .signal({
@@ -396,58 +410,58 @@ function JoinRoomPage(props) {
   };
 
   const startRecognizeFaces = async () => {
-    let checkCount = 0;
+    
     const labeledDescriptors = await loadLabeledImages();
-    console.log("labelDescriptors: ", labeledDescriptors);
     setTimeout(function () {
-      console.log("StartRecognizeFace");
-    }, 15000);
-    const faceMatcher = new faceapi.FaceMatcher(labeledDescriptors, 0.6);
-
-    let faceCheckInterval = setInterval(async () => {
       let checkCount = 0;
-      const detections = await faceapi
-        .detectAllFaces(videoRef.current)
-        .withFaceLandmarks()
-        .withFaceDescriptors();
-
-      const results = detections.map((d) => {
-        return faceMatcher.findBestMatch(d.descriptor);
-      });
-
-      results.forEach((result, i) => {
-        console.log(result);
-        if (results[0].label !== "사용자 이름") {
-          checkCount++;
-          if (checkCount === 10) {
-            // 메세지 보내는 code +
-            state.session
-              .signal({
-                data: `${state.myUserName} User Miss Match`, // Any string (optional)
-                to: connectionData, // Array of Connection objects (optional. Broadcast to everyone if empty)
-                type: "missMatch", // The type of message (optional)
-              })
-              .then(() => {
-                console.log("메시지 전송 성공");
-              })
-              .catch((error) => {
-                console.error(error);
-              });
+      const faceMatcher = new faceapi.FaceMatcher(labeledDescriptors, 0.6);
+      faceReocogCheckInterval = setInterval(async () => {
+        
+        const detections = await faceapi
+          .detectAllFaces(videoRef.current)
+          .withFaceLandmarks()
+          .withFaceDescriptors();
+  
+        const results = detections.map((d) => {
+          return faceMatcher.findBestMatch(d.descriptor);
+        });
+  
+        results.forEach((result, i) => {
+          if (result.label !== userimage) {
+            checkCount++;
+            console.log(checkCount)
+            if (checkCount === 5) {
+              // 메세지 보내는 code +
+              state.session
+                .signal({
+                  data: `${state.myUserName} User Miss Match`, // Any string (optional)
+                  to: connectionData, // Array of Connection objects (optional. Broadcast to everyone if empty)
+                  type: "missMatch", // The type of message (optional)
+                })
+                .then(() => {
+                  console.log("메시지 전송 성공");
+                })
+                .catch((error) => {
+                  console.error(error);
+                });
+              checkCount = 0;
+            }
+          } else {
             checkCount = 0;
           }
-        } else {
-          checkCount = 0;
-        }
-      });
-    }, 3000);
+        });
+      }, 3000);
+    }, 10000);
   };
 
   const loadLabeledImages = () => {
+    images.push(userimage)
     return Promise.all(
       images.map(async (label) => {
+        console.log("label",label)
         const descriptions = [];
         const img = await faceapi.fetchImage(
-          ` onFinish={joinSession}/${label}.png`
+          `https://server-jik.herokuapp.com/static${label}`
         );
 
         const detections = await faceapi
@@ -520,6 +534,51 @@ function JoinRoomPage(props) {
   };
 
   const joinSession = async () => {
+    if (UserExamCode !== String(ExamCode)) {
+      alert("시험 코드가 잘못되었습니다 다시 확인해주세요.");
+    } else {
+      console.log("ExamId", ExamId);
+      let body = {
+        Exam_id: ExamId,
+      };
+
+      dispatch(FetchExam(body)).then((response) => {
+        if (response.payload.fetchSuccess) {
+          console.log("fetchExam: ", response.payload);
+          var arr = response.payload.QuestionIdx;
+          console.log("arr", arr);
+          setTotalQuestions(arr.length * 10);
+          for (let i = 0; i < arr.length; i++) {
+            dispatch(FetchQuestions({ Question_id: arr[i] })).then(
+              (response) => {
+                console.log(response.payload);
+                if (response.payload.fetchSuccess) {
+                  console.log(response.payload);
+                  ExamQuestions.push(response.payload.QuestionInfo);
+                  ExamAnswers.push("");
+                  if (i == 0) {
+                    setnowQuestion({
+                      title: ExamQuestions[0].title,
+                      choice1: ExamQuestions[0].choice[0],
+                      choice2: ExamQuestions[0].choice[1],
+                      choice3: ExamQuestions[0].choice[2],
+                      choice4: ExamQuestions[0].choice[3],
+                    });
+                    console.log("nodwQestion: ", nowQuestion);
+                    userimage = (user.loginSuccess.user.image).substring(6)
+                  }
+                }
+              }
+            );
+          }
+         
+          setRoomNo(1);
+        } else {
+          alert("Eaxm failed");
+        }
+      });
+    }
+
     // --- 1) Get an OpenVidu object ---
     OV = await new OpenVidu();
 
@@ -527,7 +586,7 @@ function JoinRoomPage(props) {
     await setState({
       ...state,
       mySessionId: document.getElementById("basic_Room").value,
-      myUserName: document.getElementById("basic_UserName").value,
+      myUserName: user.loginSuccess.user.name,
       session: await OV.initSession(),
     });
   };
@@ -782,6 +841,7 @@ function JoinRoomPage(props) {
   useEffect(() => {
     const MODEL_URL = process.env.PUBLIC_URL + "/models";
     Promise.all([
+      faceapi.nets.ssdMobilenetv1.loadFromUri(MODEL_URL),
       faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL),
       faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL),
       faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL),
@@ -826,8 +886,9 @@ function JoinRoomPage(props) {
     dispatch(FetchExam({ Exam_id: ExamId })).then((response) => {
       if (response.payload.fetchSuccess) {
         setExamCode(response.payload.Exam_code);
-        if (user.userData && user.userData.isAdmin) {
-          alert(`${value}시험의 방 코드를 응시자에게 알려주세요.`);
+        if (user.loginSuccess && user.loginSuccess.user.role === 1) {
+          console.log(response.payload.fetchSuccess);
+          alert(`${value}시험의 방 코드 500586를 응시자에게 알려주세요.`);
         } else {
           alert(`${value}시험의 방 코드를 입력하세요.`);
           setUserDisabled(false);
@@ -854,7 +915,9 @@ function JoinRoomPage(props) {
             if (response.payload.fetchSuccess) {
               ExamQuestions.push(response.payload.QuestionInfo);
               ExamAnswers.push("");
-              if (i == 0) {
+              console.log(ExamQuestions);
+              console.log(ExamAnswers);
+              if (i === 0) {
                 setnowQuestion({
                   title: ExamQuestions[0].title,
                   choice1: ExamQuestions[0].choice[0],
@@ -862,6 +925,7 @@ function JoinRoomPage(props) {
                   choice3: ExamQuestions[0].choice[2],
                   choice4: ExamQuestions[0].choice[3],
                 });
+                console.log(nowQuestion);
               }
             }
           });
@@ -873,50 +937,10 @@ function JoinRoomPage(props) {
     });
   };
 
-  const onSubmitHandler2 = (event) => {
-    // 계속 새로고침 방지
-    event.preventDefault();
-    if (UserExamCode !== String(ExamCode)) {
-      alert("방이름과 코드가 다릅니다.");
-    } else {
-      let body = {
-        Exam_id: ExamId,
-      };
-
-      dispatch(FetchExam(body)).then((response) => {
-        if (response.payload.fetchSuccess) {
-          var arr = response.payload.QuestionIdx;
-          setTotalQuestions(arr.length * 10);
-          for (let i = 0; i < arr.length; i++) {
-            dispatch(FetchQuestions({ Question_id: arr[i] })).then(
-              (response) => {
-                if (response.payload.fetchSuccess) {
-                  ExamQuestions.push(response.payload.QuestionInfo);
-                  ExamAnswers.push("");
-                  if (i == 0) {
-                    setnowQuestion({
-                      title: ExamQuestions[0].title,
-                      choice1: ExamQuestions[0].choice[0],
-                      choice2: ExamQuestions[0].choice[1],
-                      choice3: ExamQuestions[0].choice[2],
-                      choice4: ExamQuestions[0].choice[3],
-                    });
-                  }
-                }
-              }
-            );
-          }
-          setRoomNo(1);
-        } else {
-          alert("Eaxm failed");
-        }
-      });
-    }
-  };
-
   const onEndExamHandler = (event) => {
     // 계속 새로고침 방지
     event.preventDefault();
+
     let cnt = 0;
     let missing = [];
 
@@ -929,16 +953,16 @@ function JoinRoomPage(props) {
     if (cnt !== 0) {
       alert(`${missing} 번을 아직 풀지 않았습니다.`);
     } else {
-      let correct = 0;
+      correct = 0;
       for (let i = 0; i < ExamAnswers.length; i++) {
         if (ExamAnswers[i] == ExamQuestions[i].correct_idx) {
           correct++;
         }
       }
-      let score = (correct / ExamQuestions.length) * 100;
-      alert(
-        `${score}점 입니다. (총 ${ExamQuestions.length} 문제 중에 ${correct}문제 맞췄습니다.)`
-      );
+      score = (correct / ExamQuestions.length) * 100;
+      setTimer(0);
+      setTest(10);
+      alert("영상 제출 버튼을 눌러 영상을 제출하고 점수를 확인하세요.");
     }
   };
 
@@ -951,128 +975,69 @@ function JoinRoomPage(props) {
       xs: { span: 24 },
       sm: { span: 5 },
     },
-  };  
+  };
 
   if (initial === 0) {
     return <Spin className="beforeTest" tip="Model Loading..."></Spin>;
   } else if (initial === 1 && state.session === undefined) {
     return (
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          width: "100%",
-          height: "100vh",
-        }}
-      >
-        <Content>
-          <Form {...formItemLayout}  onFinish={joinSession}>
-            <Form.Item label="Room">
-              <Input
-                size="large"
-                placeholder={user.userData.name}
-                prefix={<UserOutlined />}
-                disabled={true}
-              />
-            </Form.Item>
+      <div className="beforeTest">
+        <Form
+          name="basic"
+          initialValues={{
+            remember: true,
+          }}
+          onFinish={joinSession}
+        >
+          <Form.Item
+            id="Room"
+            label="Room"
+            name="Room"
+            initialValue={state.mySessionId}
+            rules={[
+              {
+                required: true,
+                message: "Please input RoomNumber!",
+              },
+            ]}
+          >
+            <Input />
+          </Form.Item>
 
-            <Form.Item label="Exam Name">
-              <Search placeholder="Input Exam Name" onSearch={onSearch} />
-            </Form.Item>
-            <Form.Item label="Exam Code">
-              <Input
-                size="large"
-                placeholder="ExamCode"
-                value={UserExamCode}
-                onChange={onUserExamCode}
-                disabled={UserDisabled}
-              />
-            </Form.Item>
+          <Form.Item label="Exam Name">
+            <Search placeholder="Input Exam Name" onSearch={onSearch} />
+          </Form.Item>
+          <Form.Item label="Exam Code">
+            <Input
+              size="large"
+              placeholder="ExamCode"
+              value={UserExamCode}
+              onChange={onUserExamCode}
+              disabled={UserDisabled}
+            />
+          </Form.Item>
 
-            <Form.Item {...tailLayout}>
-              <Button
-                type="primary"
-                shape="round"
-                icon={<LoginOutlined />}
-                size={"large"}
-                htmlType="submit"
-                onClick={onSubmitHandler2}
-              >
-                Join Exam
-              </Button>
-            </Form.Item>
-          </Form>
-        </Content>
-        </div>
+          <Form.Item label="User">
+            <Input
+              size="large"
+              placeholder={user.loginSuccess.user.name}
+              prefix={<UserOutlined />}
+              disabled={true}
+            />
+          </Form.Item>
+
+          <Form.Item {...tailLayout}>
+            <Button type="primary" shape="round" htmlType="submit">
+              JOIN
+            </Button>
+          </Form.Item>
+        </Form>
+      </div>
     );
-
-
-      // <div className="beforeTest">
-      //   <Form
-      //     name="basic"
-      //     initialValues={{
-      //       remember: true,
-      //     }}
-      //     onFinish={joinSession}
-      //   >
-      //     <Form.Item
-      //       id="Room"
-      //       label="Room"
-      //       name="Room"
-      //       initialValue={state.mySessionId}
-      //       rules={[
-      //         {
-      //           required: true,
-      //           message: "Please input RoomNumber!",
-      //         },
-      //       ]}
-      //     >
-      //       <Input />
-      //     </Form.Item>
-
-      //     <Form.Item
-      //       id="Exam"
-      //       label="Exam"
-      //       name="Exam"
-      //       initialValue="test"
-      //       rules={[
-      //         {
-      //           required: true,
-      //           message: "Please input ExamName!",
-      //         },
-      //       ]}
-      //     >
-      //       <Input />
-      //     </Form.Item>
-
-      //     <Form.Item
-      //       id="UserName"
-      //       label="UserName"
-      //       name="UserName"
-      //       initialValue={state.myUserName}
-      //       rules={[
-      //         {
-      //           required: true,
-      //           message: "Please input your Name!",
-      //         },
-      //       ]}
-      //     >
-      //       <Input />
-      //     </Form.Item>
-
-      //     <Form.Item {...tailLayout}>
-      //       <Button type="primary" shape="round" htmlType="submit">
-      //         JOIN
-      //       </Button>
-      //     </Form.Item>
-      //   </Form>
-      // </div>
-    // );
   } else if (
     initial === 1 &&
     state.session !== undefined &&
-    state.myUserName === "User"
+    user.loginSuccess.user.role === 1
   ) {
     return (
       <Layout>
@@ -1131,7 +1096,7 @@ function JoinRoomPage(props) {
   } else if (
     initial === 1 &&
     state.session !== undefined &&
-    state.myUserName !== "User"
+    user.loginSuccess.user.role === 0
   ) {
     return (
       <Layout>
@@ -1155,73 +1120,80 @@ function JoinRoomPage(props) {
           <video id="video" ref={videoRef} autoPlay />
         </Sider>
         <Content>
-        <div
-        style={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          width: "100%",
-          height: "50vh",
-        }}
-      >
-        <form style={{ display: "flex", flexDirection: "column" }}>
-          <Radio.Group
-            style={{ display: "block", height: "30px", lineHeight: "30px" }}
-            value={RadioValue}
-            onChange={onChangeHandler}
-          >
-            <Row gutter={[0, 24]}>
-              <Col span={100}>
-                <Title level={2}>Q. {nowQuestion.title}</Title>
-              </Col>
-            </Row>
-            <Row gutter={[0, 24]}>
-              <Col span={24}>
-                <Radio value="1">{nowQuestion.choice1}</Radio>
-              </Col>
-            </Row>
-            <Row gutter={[0, 24]}>
-              <Col span={100}>
-                <Radio value="2">{nowQuestion.choice2}</Radio>
-              </Col>
-            </Row>
-            <Row gutter={[0, 24]}>
-              <Col span={100}>
-                <Radio value="3">{nowQuestion.choice3}</Radio>
-              </Col>
-            </Row>
-            <Row gutter={[0, 24]}>
-              <Col span={100}>
-                <Radio value="4">{nowQuestion.choice4}</Radio>
-              </Col>
-            </Row>
-            <Row gutter={[0, 24]}>
-              <Col span={100}>
-                <Pagination
-                  simple
-                  total={TotalQuestions}
-                  current={nowQuestionidx}
-                  onChange={onChangeQuestions}
-                />
-              </Col>
-            </Row>
-            <Row gutter={[0, 24]}>
-              <Col span={100}>
-                <Button
-                  type="primary"
-                  shape="round"
-                  icon={<RightSquareOutlined />}
-                  size={"large"}
-                  htmlType="submitTe"
-                  onClick={onEndExamHandler}
+          {timer === 0 ? null : (
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                width: "100%",
+                height: "50vh",
+              }}
+            >
+              <form style={{ display: "flex", flexDirection: "column" }}>
+                <Radio.Group
+                  style={{
+                    display: "block",
+                    height: "30px",
+                    lineHeight: "30px",
+                  }}
+                  value={RadioValue}
+                  onChange={onChangeHandler}
                 >
-                  End Exam
-                </Button>
-              </Col>
-            </Row>
-          </Radio.Group>
-        </form>
-      </div>
+                  <Row gutter={[0, 24]}>
+                    <Col span={100}>
+                      <Title level={2}>Q. {nowQuestion.title}</Title>
+                    </Col>
+                  </Row>
+                  <Row gutter={[0, 24]}>
+                    <Col span={24}>
+                      <Radio value="1">{nowQuestion.choice1}</Radio>
+                    </Col>
+                  </Row>
+                  <Row gutter={[0, 24]}>
+                    <Col span={100}>
+                      <Radio value="2">{nowQuestion.choice2}</Radio>
+                    </Col>
+                  </Row>
+                  <Row gutter={[0, 24]}>
+                    <Col span={100}>
+                      <Radio value="3">{nowQuestion.choice3}</Radio>
+                    </Col>
+                  </Row>
+                  <Row gutter={[0, 24]}>
+                    <Col span={100}>
+                      <Radio value="4">{nowQuestion.choice4}</Radio>
+                    </Col>
+                  </Row>
+                  <Row gutter={[0, 24]}>
+                    <Col span={100}>
+                      <Pagination
+                        simple
+                        total={TotalQuestions}
+                        current={nowQuestionidx}
+                        onChange={onChangeQuestions}
+                      />
+                    </Col>
+                  </Row>
+                  <Row gutter={[0, 24]}>
+                    <Col span={100}>
+                      <Button
+                        id="testendBtn"
+                        type="primary"
+                        shape="round"
+                        icon={<RightSquareOutlined />}
+                        size={"large"}
+                        htmlType="submitTe"
+                        onClick={onEndExamHandler}
+                      >
+                        시험 제출
+                      </Button>
+                    </Col>
+                  </Row>
+                </Radio.Group>
+              </form>
+            </div>
+          )}
         </Content>
         <Sider theme={"light"} width={"12vw"}>
           <div id="button">
@@ -1232,7 +1204,7 @@ function JoinRoomPage(props) {
               onClick={startTest}
               style={{ margin: "0.5vh" }}
             >
-              Test Start
+              시험 시작
             </Button>
             <Button
               id="startDownload"
@@ -1241,7 +1213,7 @@ function JoinRoomPage(props) {
               onClick={startDownload}
               style={{ margin: "0.5vh" }}
             >
-              Download
+              영상 제출
             </Button>
           </div>
           <hr />
@@ -1253,124 +1225,32 @@ function JoinRoomPage(props) {
         </Sider>
       </Layout>
     );
-  } else {
+  } else if (initial === 2) {
     return (
-      <Result
-        status="success"
-        title="Successfully End Test!!!"
-        extra={[
-          <Button type="primary" key="console" onClick={leaveTest}>
-            홈으로
-          </Button>,
-        ]}
-      />
+      <div
+        
+      >
+        <Result
+          status="success"
+          title="시험 종료"
+          extra={[
+            <Button type="primary" key="console" onClick={leaveTest}>
+              <a href="/">Home</a>
+            </Button>,
+          ]}
+        />
+        <div style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          fontSize: "large"
+        }}>
+           {score}점 {ExamQuestions.length}문제 중에 {correct}문제 맞췄습니다.
+        </div>
+       
+      </div>
     );
   }
 }
-
-//   if (RoomNo == 0 && user.userData && user.userData.isAdmin) {
-//     return (
-//       <div
-//         style={{
-//           display: "flex",
-//           justifyContent: "center",
-//           alignItems: "center",
-//           width: "100%",
-//           height: "100vh",
-//         }}
-//       >
-//         <Content>
-//           <Form {...formItemLayout}>
-//             <Form.Item label="Name">
-//               <Input
-//                 size="large"
-//                 placeholder={user.userData.name}
-//                 prefix={<UserOutlined />}
-//                 disabled={true}
-//               />
-//             </Form.Item>
-
-//             <Form.Item label="Exam Name">
-//               <Search placeholder="Input Exam Name" onSearch={onSearch} />
-//             </Form.Item>
-//             <Form.Item label="Exam Code">
-//               <Input
-//                 size="large"
-//                 placeholder={ExamCode}
-//                 prefix={<FormOutlined />}
-//                 disabled={UserDisabled}
-//               />
-//             </Form.Item>
-
-//             <Form.Item {...tailLayout}>
-//               <Button
-//                 type="primary"
-//                 shape="round"
-//                 icon={<LoginOutlined />}
-//                 size={"large"}
-//                 htmlType="submit"
-//                 onClick={onSubmitHandler}
-//               >
-//                 Join Exam
-//               </Button>
-//             </Form.Item>
-//           </Form>
-//         </Content>
-//       </div>
-//     );
-//   }
-//   if (RoomNo == 0 && user.userData && !user.userData.isAdmin) {
-//     return (
-//       <div
-//         style={{
-//           display: "flex",
-//           justifyContent: "center",
-//           alignItems: "center",
-//           width: "100%",
-//           height: "100vh",
-//         }}
-//       >
-//         <Content>
-//           <Form {...formItemLayout}>
-//             <Form.Item label="Name">
-//               <Input
-//                 size="large"
-//                 placeholder={user.userData.name}
-//                 prefix={<UserOutlined />}
-//                 disabled={true}
-//               />
-//             </Form.Item>
-
-//             <Form.Item label="Exam Name">
-//               <Search placeholder="Input Exam Name" onSearch={onSearch} />
-//             </Form.Item>
-//             <Form.Item label="Exam Code">
-//               <Input
-//                 size="large"
-//                 placeholder="ExamCode"
-//                 value={UserExamCode}
-//                 onChange={onUserExamCode}
-//                 disabled={UserDisabled}
-//               />
-//             </Form.Item>
-
-//             <Form.Item {...tailLayout}>
-//               <Button
-//                 type="primary"
-//                 shape="round"
-//                 icon={<LoginOutlined />}
-//                 size={"large"}
-//                 htmlType="submit"
-//                 onClick={onSubmitHandler2}
-//               >
-//                 Join Exam
-//               </Button>
-//             </Form.Item>
-//           </Form>
-//         </Content>
-//       </div>
-//     );
-//   } 
-// }
 
 export default withRouter(JoinRoomPage);

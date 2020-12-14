@@ -75,7 +75,6 @@ function MakeTestPage(props) {
 
   const onMakeTestHandler = (event) =>{
     // 계속 새로고침 방지
-    
     event.preventDefault();
     let body = {
       Exam_id: ExamId,

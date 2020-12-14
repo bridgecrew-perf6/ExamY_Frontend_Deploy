@@ -1,12 +1,13 @@
 aside{
-    height: 100vh;
+    height: 90vh;
     text-align: center;
+    border-top: 3px solid black;
     border-right: 3px solid black;
     border-left: 3px solid black;
   }
   
   iframe{
-    height: 70vh;
+    height: 60vh;
   }
   
   #button {

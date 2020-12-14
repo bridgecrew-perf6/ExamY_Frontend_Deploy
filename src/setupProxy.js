@@ -3,7 +3,7 @@ module.exports = function(app){
   app.use(
     '/api',
     createProxyMiddleware({
-      target: 'https://server-jik.herokuapp.com/',
+      target: 'https://server-jik.herokuapp.com/api',
       changeOrigin: true,
     })
   )
