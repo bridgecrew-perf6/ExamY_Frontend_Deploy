@@ -598,7 +598,7 @@ function JoinRoomPage(props) {
 
     mySession.on("connectionCreated", async (event) => {
       if (
-        state.myUserName === "User" &&
+        state.myUserName === "감독관" &&
         event.connection.remoteOptions !== undefined
       ) {
         await connectionData.push(event.connection);
@@ -608,7 +608,7 @@ function JoinRoomPage(props) {
           event.connection.remoteOptions["metadata"].substring(
             15,
             event.connection.remoteOptions["metadata"].length - 2
-          ) === "User"
+          ) === "감독관"
         ) {
           await connectionData.push(event.connection);
         }
