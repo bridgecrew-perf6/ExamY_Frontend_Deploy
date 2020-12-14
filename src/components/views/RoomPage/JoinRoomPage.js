@@ -233,12 +233,12 @@ function JoinRoomPage(props) {
           setTimer(1);
         });
 
-      // records = OV.initLocalRecorder(state.mainStreamManager["stream"]);
-      // records.record();
+      records = OV.initLocalRecorder(state.mainStreamManager["stream"]);
+      records.record();
       // startFaceApi();
       // startObjectDetect();
       // startMyModel();
-      startRecognizeFaces();
+      // startRecognizeFaces();
       
     } else {
       state.session
@@ -263,10 +263,10 @@ function JoinRoomPage(props) {
     // clearInterval(faceapiInterval);
     // clearInterval(objectdetectInterval);
     // clearInterval(sidefaceInterval);
-    clearInterval(faceReocogCheckInterval())
-    // await records.stop();
-    // blob = records.getBlob();
-    // uploadVideo();
+    // clearInterval(faceReocogCheckInterval())
+    await records.stop();
+    blob = records.getBlob();
+    uploadVideo();
   };
 
   const startFaceApi = () => {
