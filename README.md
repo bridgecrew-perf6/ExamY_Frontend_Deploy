@@ -36,5 +36,5 @@
 
 ### 기타사항
 
-- 현재 heroku, mongoDB 연동 문제로 인해 실제 데모는 작동하지 않는 이슈가 있습니다.
+- 현재 WEB-RTC 서버 연동 문제로 인해 실제 데모는 작동하지 않는 이슈가 있습니다.
 - [데모영상](https://www.youtube.com/watch?v=8XiyuhnKvyE)
