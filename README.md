@@ -1,70 +1,40 @@
-# Getting Started with Create React App
+# ExamY
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## 👋 ExamY 소개
 
-## Available Scripts
+- 온라인 시험 감독 서비스 제공을 위한 `시험 제작`, `자동 부정행위를 감지`하는 웹 어플리케이션입니다.
+- 시험 제작 : 관리자는 시험 문제집을 제작할 수 있고, 시험을 개설할 수 있습니다.
+- 자동 부정행위 감지 : Pre-trained 모델을 활용하여 사용자의 부정행위를 자동 감지할 수 있습니다.
 
-In the project directory, you can run:
+## 🔨 기술 스택
 
-### `yarn start`
+<p align='center'>
+    <img src="https://img.shields.io/badge/MongoDB-4EA94B?style=for-the-badge&logo=mongodb&logoColor=white"/>
+     <img src="https://img.shields.io/badge/Express.js-404D59?style=for-the-badge"/>
+      <img src="https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB"/>
+    <img src="https://img.shields.io/badge/Node.js-43853D?style=for-the-badge&logo=node.js&logoColor=white"/>
+    <img src="https://img.shields.io/badge/Heroku-430098?style=for-the-badge&logo=heroku&logoColor=white"/>
+</p>
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+## 🏛 프로젝트 아키텍처
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+![image](https://user-images.githubusercontent.com/48426909/134015147-dbef766c-48f6-4f5a-a39f-7b913c8c2a21.png)
 
-### `yarn test`
+### API URI
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+| 번호 | 유형 | URI                         | 설명                                                |
+| :--- | :--- | :-------------------------- | :-------------------------------------------------- |
+| 1    | POST | /api/users/login            | 입력한 이메일&비밀번호를 기준으로 로그인 요청       |
+| 2    | GET  | /api/users/logout           | 현재 로그인 된 유저를 로그아웃 요청                 |
+| 3    | POST | /api/users/register         | 유저 정보를 기반으로 회원가입 요청                  |
+| 4    | GET  | /api/users/auth             | 지금 로그인된 현재 유저의 인증 정보를 요청          |
+| 5    | POST | /api/users/upload/userimage | 유저의 얼굴 이미지를 따로 DB에 저장 요청            |
+| 6    | POST | /api/test/upload/question   | 관리자가 제작한 문제들 DB에 저장 요청               |
+| 7    | POST | /api/test/maketest          | 제작된 문제들을 바탕으로 DB에 시험 정보를 저장 요청 |
+| 8    | POST | /api/room/fetch/exam        | Exam Code를 기준으로 시험의 정보들을 가져오는 요청  |
+| 9    | POST | /api/room/fetch/questions   | Exam Code를 기준으로 시험의 문제들을 가져오는 요청  |
 
-### `yarn build`
+### 기타사항
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `yarn eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
-
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `yarn build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+- 현재 heroku, mongoDB 연동 문제로 인해 실제 데모는 작동하지 않는 이슈가 있습니다.
+- [데모영상](https://www.youtube.com/watch?v=8XiyuhnKvyE)
